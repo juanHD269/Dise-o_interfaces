@@ -9,10 +9,16 @@ import { Task } from "@/types/task";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function DashboardPage() {
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", []);
   const [tasks] = useLocalStorage<Task[]>("tasks", []);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
@@ -31,7 +37,7 @@ export default function DashboardPage() {
   return (
     <main className="p-6 max-w-6xl mx-auto space-y-10">
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">👋 Hola, {currentUser.name}</h1>
+        <h1 className="text-2xl font-bold text-white">👋 Hola, {currentUser.name}</h1>
         <button
           onClick={() => {
             localStorage.removeItem("currentUser");
@@ -45,7 +51,7 @@ export default function DashboardPage() {
 
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">📁 Mis Proyectos</h2>
+          <h2 className="text-xl font-semibold text-white">📁 Mis Proyectos</h2>
           <button
             onClick={() => setShowForm(true)}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -56,7 +62,7 @@ export default function DashboardPage() {
         </div>
 
         {userProjects.length === 0 ? (
-          <p className="text-gray-500">Aún no tienes proyectos.</p>
+          <p className="text-gray-400">Aún no tienes proyectos.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {userProjects.map((project) => (
