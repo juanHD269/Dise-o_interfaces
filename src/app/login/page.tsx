@@ -28,22 +28,22 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Bienvenido de nuevo</h2>
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
             <input
               type="email"
               placeholder="Correo electrónico"
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full text-gray-700 pl-10 pr-3 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
             <input
               type="password"
               placeholder="Contraseña"
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+              className="w-full text-gray-700 pl-10 pr-3 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
