@@ -23,10 +23,14 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
-    if (stored) setCurrentUser(JSON.parse(stored));
+    if (stored) {
+      setCurrentUser(JSON.parse(stored));
+    } else {
+      window.location.href = "/login"; // 🔁 Redirige al login si no hay usuario
+    }
   }, []);
 
-  if (!currentUser) return <div className="p-6">Cargando usuario...</div>;
+  if (!currentUser) return null;
 
   const userProjects = projects.filter((p) => p.userId === currentUser.id);
 
