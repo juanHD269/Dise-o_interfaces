@@ -29,7 +29,11 @@ export default function TasksClient() {
 
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
-    if (stored) setCurrentUser(JSON.parse(stored));
+    if (stored) {
+      setCurrentUser(JSON.parse(stored));
+    } else {
+      window.location.href = "/login"; // 🔁 Redirige al login si no hay usuario
+    }
   }, []);
 
   if (!currentUser || !selectedProjectId) return null;
