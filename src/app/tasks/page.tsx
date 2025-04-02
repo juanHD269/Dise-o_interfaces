@@ -15,57 +15,20 @@ export default function TasksPage() {
   const [projects] = useLocalStorage<Project[]>("projects", []);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const searchParams = useSearchParams();
-
   const selectedProjectId = searchParams.get("projectId");
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
-    projectId: "",
-    assignedTo: "",
   });
 
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
-    if (stored) {
-      const user = JSON.parse(stored);
-      setCurrentUser(user);
+    if (stored) setCurrentUser(JSON.parse(stored));
+  }, []);
 
-      const accessibleProjects = projects.filter(
-        (p) => p.userId === user.id || p.participants.includes(user.email)
-      );
-
-      if (!selectedProjectId && accessibleProjects.length > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          projectId: accessibleProjects[0].id,
-        }));
-      }
-    }
-  }, [projects, selectedProjectId]);
-
-  if (!currentUser) return null;
-
-  // 🔍 Mostrar proyectos donde soy dueño o participante
-  const accessibleProjects = projects.filter(
-    (p) => p.userId === currentUser.id || p.participants.includes(currentUser.email)
-  );
-
-  const selectedProject = accessibleProjects.find(
-    (p) => p.id === formData.projectId
-  );
-
-  // ✅ Miembros: creador + participantes sin duplicados
-  const projectMembers = selectedProject
-    ? Array.from(new Set([selectedProject.userId, ...selectedProject.participants]))
-    : [];
-
-  const filteredTasks = tasks.filter(
-    (task) =>
-      accessibleProjects.some((p) => p.id === task.projectId) &&
-      (!selectedProjectId || task.projectId === selectedProjectId)
-  );
+  if (!currentUser || !selectedProjectId) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,17 +39,18 @@ export default function TasksPage() {
       title: formData.title,
       description: formData.description,
       dueDate: formData.dueDate,
-      projectId: formData.projectId,
+      projectId: selectedProjectId,
       status: "todo",
-      assignedTo: formData.assignedTo,
     };
 
     setTasks([...tasks, newTask]);
-    setFormData({ ...formData, title: "", description: "", dueDate: "", assignedTo: "" });
+    setFormData({ title: "", description: "", dueDate: "" });
   };
 
+  const filteredTasks = tasks.filter((t) => t.projectId === selectedProjectId);
+
   return (
-    <main className="p-6 max-w-6xl mx-auto space-y-10">
+    <main className="p-6 max-w-6xl mx-auto space-y-10 text-gray-800">
       <Link
         href="/"
         className="inline-flex items-center text-sm text-blue-600 hover:underline mb-6"
@@ -104,7 +68,7 @@ export default function TasksPage() {
           <input
             type="text"
             placeholder="Título"
-            className="col-span-1 p-2 rounded border"
+            className="col-span-1 p-2 rounded border placeholder:text-gray-800 text-gray-800"
             value={formData.title}
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
@@ -113,7 +77,7 @@ export default function TasksPage() {
           <input
             type="text"
             placeholder="Descripción"
-            className="col-span-1 p-2 rounded border"
+            className="col-span-1 p-2 rounded border placeholder:text-gray-800 text-gray-800"
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
@@ -121,42 +85,12 @@ export default function TasksPage() {
           />
           <input
             type="date"
-            className="col-span-1 p-2 rounded border"
+            className="col-span-1 p-2 rounded border text-gray-800"
             value={formData.dueDate}
             onChange={(e) =>
               setFormData({ ...formData, dueDate: e.target.value })
             }
           />
-          <select
-            className="col-span-1 p-2 rounded border"
-            value={formData.projectId}
-            onChange={(e) =>
-              setFormData({ ...formData, projectId: e.target.value })
-            }
-          >
-            {accessibleProjects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Selector de encargado */}
-          <select
-            className="col-span-1 p-2 rounded border"
-            value={formData.assignedTo}
-            onChange={(e) =>
-              setFormData({ ...formData, assignedTo: e.target.value })
-            }
-          >
-            <option value="">Selecciona responsable</option>
-            {projectMembers.map((email) => (
-              <option key={email} value={email}>
-                {email}
-              </option>
-            ))}
-          </select>
-
           <button
             type="submit"
             className="mt-2 md:mt-0 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition col-span-full md:col-auto"
@@ -171,14 +105,14 @@ export default function TasksPage() {
         <KanbanBoard
           tasks={filteredTasks}
           onStatusChange={(taskId, newStatus) => {
-            const updatedTasks = tasks.map((t) =>
+            const updated = tasks.map((t) =>
               t.id === taskId ? { ...t, status: newStatus } : t
             );
-            setTasks(updatedTasks);
+            setTasks(updated);
           }}
           onDelete={(taskId) => {
-            const confirmed = confirm("¿Eliminar esta tarea?");
-            if (confirmed) {
+            const confirmDelete = confirm("¿Eliminar esta tarea?");
+            if (confirmDelete) {
               setTasks(tasks.filter((t) => t.id !== taskId));
             }
           }}

@@ -1,6 +1,19 @@
-"use client";
 import { Task, TaskStatus } from "@/types/task";
-import { Trash2, RotateCcw } from "lucide-react";
+import { ArrowRight, ArrowLeft, Trash2 } from "lucide-react";
+
+// ✅ Mapa para avanzar estado
+const nextStatusMap: Record<TaskStatus, TaskStatus | null> = {
+  todo: "in-progress",
+  "in-progress": "done",
+  done: null,
+};
+
+// ✅ Mapa para retroceder estado
+const prevStatusMap: Record<TaskStatus, TaskStatus | null> = {
+  todo: null,
+  "in-progress": "todo",
+  done: "in-progress",
+};
 
 interface Props {
   task: Task;
@@ -8,53 +21,66 @@ interface Props {
   onDelete: (taskId: string) => void;
 }
 
-const statusOrder: TaskStatus[] = ["todo", "in-progress", "done"];
-
 export default function TaskCard({ task, onStatusChange, onDelete }: Props) {
-  const currentIndex = statusOrder.indexOf(task.status);
-  const nextStatus = statusOrder[currentIndex + 1];
-  const prevStatus = statusOrder[currentIndex - 1];
+  const next = nextStatusMap[task.status];
+  const prev = prevStatusMap[task.status];
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 relative">
-      <button
-        onClick={() => onDelete(task.id)}
-        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition"
-        title="Eliminar tarea"
-      >
-        <Trash2 size={16} />
-      </button>
+    <div className="bg-white p-4 rounded-xl shadow-md border space-y-2">
+      <h4 className="text-lg font-bold text-gray-900">{task.title}</h4>
 
-      <h4 className="font-semibold text-gray-800">{task.title}</h4>
+      {task.description && (
+        <p className="text-sm text-gray-700">{task.description}</p>
+      )}
 
       {task.dueDate && (
-        <p className="text-sm text-gray-500 mt-1">
-          📅 {new Date(task.dueDate).toLocaleDateString()}
+        <p className="text-xs text-gray-600 flex items-center gap-1">
+          <svg
+            className="w-4 h-4 text-blue-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+          {task.dueDate}
         </p>
       )}
-      {task.description && (
-        <p className="text-sm text-gray-600 mt-2">{task.description}</p>
-      )}
 
-      <div className="flex gap-2 mt-4">
-        {prevStatus && (
-          <button
-            onClick={() => onStatusChange(task.id, prevStatus)}
-            className="text-sm flex items-center gap-1 bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 transition"
-          >
-            <RotateCcw size={14} />
-            Devolver
-          </button>
-        )}
+      <div className="flex justify-between items-center mt-3">
+        <div className="flex gap-2">
+          {prev && (
+            <button
+              onClick={() => onStatusChange(task.id, prev)}
+              className="p-1.5 rounded-full bg-white border hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              title="Retroceder estado"
+            >
+              <ArrowLeft size={16} />
+            </button>
+          )}
+          {next && (
+            <button
+              onClick={() => onStatusChange(task.id, next)}
+              className="p-1.5 rounded-full bg-white border hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              title="Avanzar estado"
+            >
+              <ArrowRight size={16} />
+            </button>
+          )}
+        </div>
 
-        {nextStatus && (
-          <button
-            onClick={() => onStatusChange(task.id, nextStatus)}
-            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
-          >
-            Mover a: {nextStatus === "in-progress" ? "En Proceso" : "Completadas"}
-          </button>
-        )}
+        <button
+          onClick={() => onDelete(task.id)}
+          className="p-1.5 rounded-full bg-white border hover:bg-red-100 text-red-500 hover:text-red-700"
+          title="Eliminar tarea"
+        >
+          <Trash2 size={16} />
+        </button>
       </div>
     </div>
   );

@@ -1,88 +1,76 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import NewProjectForm from "@/components/newprojectform";
+import ProjectProgress from "@/components/projectprogress";
 import { useLocalStorage } from "@/hooks/uselocalstorage";
 import { Project } from "@/types/project";
 import { Task } from "@/types/task";
-import ProjectProgress from "@/components/projectprogress";
-import { PlusCircle, LogOut } from "lucide-react";
-import NewProjectForm from "@/components/newprojectform";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 
-export default function HomePage() {
+export default function DashboardPage() {
   const [projects, setProjects] = useLocalStorage<Project[]>("projects", []);
   const [tasks] = useLocalStorage<Task[]>("tasks", []);
-  const [showForm, setShowForm] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const router = useRouter();
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
-    if (!stored) {
-      router.push("/login");
-    } else {
-      setCurrentUser(JSON.parse(stored));
-    }
+    if (stored) setCurrentUser(JSON.parse(stored));
   }, []);
 
-  if (!currentUser) return null;
+  if (!currentUser) return <div className="p-6">Cargando usuario...</div>;
 
-  const userProjects = projects.filter(p => p.userId === currentUser.id);
+  const userProjects = projects.filter((p) => p.userId === currentUser.id);
 
-  const handleAddProject = (project: { id: string; name: string; participants: string[] }) => {
-    setProjects([
-      ...projects,
-      {
-        ...project,
-        userId: currentUser.id,
-      },
-    ]);
-  };
-  
-
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    router.push("/login");
+  const handleAddProject = (project: { id: string; name: string }) => {
+    setProjects([...projects, { ...project, userId: currentUser.id }]);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-6 md:p-10">
-      <div className="max-w-5xl mx-auto">
-        <header className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">🎯 Bienvenido, {currentUser.name}</h1>
-            <p className="text-gray-500 mt-1">Tus proyectos personales</p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition"
-            >
-              <PlusCircle size={18} />
-              Nuevo Proyecto
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm border rounded-xl hover:bg-gray-100"
-            >
-              <LogOut size={16} />
-              Cerrar Sesión
-            </button>
-          </div>
-        </header>
+    <main className="p-6 max-w-6xl mx-auto space-y-10">
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">👋 Hola, {currentUser.name}</h1>
+        <button
+          onClick={() => {
+            localStorage.removeItem("currentUser");
+            location.href = "/login";
+          }}
+          className="text-sm text-red-500 hover:underline"
+        >
+          Cerrar sesión
+        </button>
+      </header>
+
+      <section>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">📁 Mis Proyectos</h2>
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            <PlusCircle size={18} />
+            Nuevo Proyecto
+          </button>
+        </div>
 
         {userProjects.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow p-6 text-center text-gray-600">
-            <p>No tienes proyectos aún.</p>
-          </div>
+          <p className="text-gray-500">Aún no tienes proyectos.</p>
         ) : (
-          <section className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {userProjects.map((project) => (
-              <ProjectProgress key={project.id} project={project} tasks={tasks} />
+              <Link
+                key={project.id}
+                href={`/tasks?projectId=${project.id}`}
+                className="block border rounded-xl p-4 shadow hover:shadow-md transition"
+              >
+                <ProjectProgress project={project} tasks={tasks} />
+              </Link>
             ))}
-          </section>
+          </div>
         )}
-      </div>
+      </section>
 
       {showForm && (
         <NewProjectForm

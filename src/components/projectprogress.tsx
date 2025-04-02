@@ -1,39 +1,28 @@
-// src/components/projectprogress.tsx
-"use client";
-import { Task } from "@/types/task";
 import { Project } from "@/types/project";
-import { useRouter } from "next/navigation";
+import { Task } from "@/types/task";
 
-interface ProjectProgressProps {
+interface Props {
   project: Project;
   tasks: Task[];
 }
 
-export default function ProjectProgress({ project, tasks }: ProjectProgressProps) {
-  const router = useRouter();
-  const projectTasks = tasks.filter((task) => task.projectId === project.id);
-  const completed = projectTasks.filter((task) => task.status === "done").length;
+export default function ProjectProgress({ project, tasks }: Props) {
+  const projectTasks = tasks.filter((t) => t.projectId === project.id);
+  const completed = projectTasks.filter((t) => t.status === "done").length;
   const total = projectTasks.length;
-  const progress = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-  const handleClick = () => {
-    router.push(`/tasks?projectId=${project.id}`);
-  };
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <div
-      onClick={handleClick}
-      className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 hover:shadow-md transition cursor-pointer"
-    >
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">{project.name}</h3>
-      <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+    <div>
+      <h3 className="text-lg font-semibold mb-2">{project.name}</h3>
+      <div className="bg-gray-200 h-3 rounded-full overflow-hidden">
         <div
-          className="bg-blue-600 h-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
+          className="bg-blue-600 h-full transition-all"
+          style={{ width: `${percent}%` }}
         />
       </div>
-      <p className="mt-2 text-sm text-gray-600">
-        {completed} de {total} tareas completadas ({progress}%)
+      <p className="text-sm text-gray-500 mt-1">
+        {completed} de {total} tareas completadas
       </p>
     </div>
   );

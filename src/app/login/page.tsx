@@ -22,8 +22,8 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-6 rounded-xl shadow w-full max-w-md">
         <h2 className="text-xl font-bold mb-4">Iniciar Sesión</h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <input
@@ -41,7 +41,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">
             Ingresar
           </button>
         </form>

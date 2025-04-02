@@ -1,4 +1,3 @@
-// src/hooks/uselocalstorage.tsx
 import { useEffect, useState } from "react";
 
 export function useLocalStorage<T>(key: string, initialValue: T) {

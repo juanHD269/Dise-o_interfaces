@@ -4,21 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   onClose: () => void;
-  onSave: (project: { id: string; name: string; participants: string[] }) => void;
+  onSave: (project: { id: string; name: string }) => void;
 }
 
 export default function NewProjectForm({ onClose, onSave }: Props) {
   const [name, setName] = useState("");
-  const [participantEmail, setParticipantEmail] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]);
-
-  const handleAddParticipant = () => {
-    const email = participantEmail.trim();
-    if (email && !participants.includes(email)) {
-      setParticipants([...participants, email]);
-      setParticipantEmail("");
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +17,6 @@ export default function NewProjectForm({ onClose, onSave }: Props) {
     const newProject = {
       id: uuidv4(),
       name: name.trim(),
-      participants,
     };
 
     onSave(newProject);
@@ -42,35 +31,10 @@ export default function NewProjectForm({ onClose, onSave }: Props) {
           <input
             type="text"
             placeholder="Nombre del proyecto"
-            className="w-full border border-gray-300 rounded-xl p-2"
+            className="w-full border border-gray-300 rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-
-          <div className="space-y-2">
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Agregar participante (correo)"
-                className="flex-1 border p-2 rounded-xl"
-                value={participantEmail}
-                onChange={(e) => setParticipantEmail(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleAddParticipant}
-                className="bg-blue-600 text-white px-3 rounded-xl hover:bg-blue-700"
-              >
-                Añadir
-              </button>
-            </div>
-            <ul className="text-sm text-gray-600 list-disc pl-5">
-              {participants.map((p) => (
-                <li key={p}>{p}</li>
-              ))}
-            </ul>
-          </div>
-
           <div className="flex justify-end gap-2">
             <button
               type="button"
@@ -83,7 +47,7 @@ export default function NewProjectForm({ onClose, onSave }: Props) {
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
             >
-              Crear Proyecto
+              Crear
             </button>
           </div>
         </form>
